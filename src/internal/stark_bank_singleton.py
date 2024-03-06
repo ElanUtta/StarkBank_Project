@@ -1,10 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Union
-
 import starkbank
-from starkcore import Project, Organization
 
-from config.env import ENVIROMENT, PROJECT_ID
+from config.env import ENVIRONMENT, PROJECT_ID
 from src.utils import CredentialsEnv
 from src.utils import Credentials
 
@@ -26,7 +23,7 @@ class StarkBankSingleton(StarkBank):
 
     def initialize_project(self, credentials: Credentials):
         project = starkbank.Project(
-            environment=ENVIROMENT,
+            environment=ENVIRONMENT,
             id=PROJECT_ID,
             private_key=credentials.get()
         )

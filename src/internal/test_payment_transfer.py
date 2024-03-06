@@ -1,10 +1,7 @@
 import pytest
 from datetime import datetime, timedelta, timezone
-from unittest.mock import MagicMock
 
-# Your PaymentTransfer might be in a different module, change the import accordingly
-from src.internal.PaymentTransfer import PaymentTransfer, transform_to_datetime, Rule
-from fastapi import HTTPException
+from src.internal.payment_transfer import PaymentTransfer, transform_to_datetime
 
 # Test constants
 BANK_CODE = "000"
@@ -18,7 +15,7 @@ FINE = 2  # 2%
 INTEREST = 1  # 1% every 30 days
 
 
-# Keep the time-related fixtures dynamically computed to avoid expired test scenarios
+
 @pytest.fixture
 def due_date():
     return datetime.now(timezone.utc) + timedelta(days=3)
@@ -61,29 +58,24 @@ def test_transform_to_datetime():
 
 
 def test_due_date_before_now(payment_transfer):
-    # Make due date in the past to test overdue scenario
     payment_transfer.due = datetime.now(timezone.utc) - timedelta(days=1)
     assert payment_transfer.check_due_date()
 
 
 def test_due_date_after_now(payment_transfer):
-    # Due date in the future should not be considered overdue
     assert not payment_transfer.check_due_date()
 
 
 def test_expiration_date_before_now(payment_transfer):
-    # Set the expiration date in the past
     payment_transfer.expiration = int((datetime.now(timezone.utc) - timedelta(days=1)).timestamp())
     assert payment_transfer.is_invoice_expired()
 
 
 def test_expiration_date_after_now(payment_transfer):
-    # Expiration date in the future should not be expired
     assert payment_transfer.is_invoice_expired() is False
 
 
 def test_calculate_delay_fine(payment_transfer):
-    # Overdue payment should have fine calculated
     initial_amount = payment_transfer._amount
     payment_transfer.due = datetime.now(timezone.utc) - timedelta(days=1)
     payment_transfer.calculate_delay_fine()
@@ -92,7 +84,6 @@ def test_calculate_delay_fine(payment_transfer):
 
 
 def test_calculate_delay_interest(payment_transfer):
-    # Overdue payment should accrue interest
     initial_amount = payment_transfer._amount
     payment_transfer.due = datetime.now(timezone.utc) - timedelta(days=61)  # Overdue by 2 months
     payment_transfer.calculate_delay_interest()
@@ -101,15 +92,12 @@ def test_calculate_delay_interest(payment_transfer):
 
 
 def test_should_not_calculate_fees_if_not_due(payment_transfer):
-    # Payment is not overdue, fees should not be applied
     initial_amount = payment_transfer._amount
     payment_transfer.should_calculate_fees()
     assert payment_transfer._amount == initial_amount  # Amount should remain the same
 
 
 def test_should_calculate_fees_if_due_and_not_expired(payment_transfer):
-    # Payment overdue but not expired should have fees
     payment_transfer.due = datetime.now(timezone.utc) - timedelta(days=1)
     payment_transfer.should_calculate_fees()
-    # Fine and interest should be applied
     assert payment_transfer._amount != AMOUNT

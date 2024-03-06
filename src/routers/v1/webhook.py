@@ -3,8 +3,8 @@ from starlette.responses import JSONResponse
 
 from src.schema.invoice import WebhookPayload
 from src.utils.logging_config import logger
-from src.internal.PaymentTransfer import PaymentTransfer
-from src.internal.StarkBankSingleton import StarkBankSingleton, get_client
+from src.internal.payment_transfer import PaymentTransfer
+from src.internal.stark_bank_singleton import StarkBankSingleton, get_client
 
 webhook_router = APIRouter(
     prefix="/webhook",

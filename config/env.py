@@ -6,6 +6,6 @@ load_dotenv(".env")
 
 # Accessing variables
 PRIVATE_KEY = os.getenv('PRIVATE_KEY')
-ENVIROMENT = os.getenv('ENVIROMENT')
+ENVIRONMENT = os.getenv('ENVIRONMENT')
 PROJECT_ID = os.getenv('PROJECT_ID')
 
