@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 from fastapi import HTTPException
 
-from internal import PaymentTransfer
+from src.internal.PaymentTransfer import PaymentTransfer
 
 MOCK_TRANSFER = {
     "bank_code": "20018183",
